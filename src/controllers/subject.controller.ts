@@ -17,7 +17,8 @@ export const createSubject = async (req: AuthRequest, res: Response) => {
         const newSubject = new Subject({
             name,
             description,
-            color
+            color,
+            userId: req.user._id
         })
 
         await newSubject.save()
@@ -37,11 +38,14 @@ export const getSubjects = async (req: AuthRequest, res: Response) => {
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized" })
         }
-        const subjects = await Subject.find()
+
+        const subjects = await Subject.find({ userId: req.user._id })
+
         res.status(200).json({
             message: "Subjects retrieved successfully",
             data: subjects
         })
+
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Fail to Retrieve Subjects" })
@@ -56,7 +60,7 @@ export const deleteSubject = async (req: AuthRequest, res: Response) => {
 
         const subjectId = req.params.id
 
-        const deletedSubject = await Subject.findByIdAndDelete(subjectId)
+        const deletedSubject = await Subject.findOneAndDelete({ _id: subjectId, userId: req.user._id })
 
         if (!deletedSubject) {
             return res.status(404).json({ message: "Subject not found" })
@@ -83,7 +87,7 @@ export const updateSubject = async (req: AuthRequest, res: Response) => {
         const { name, description, color } = req.body
         
         const updatedSubject = await Subject.findByIdAndUpdate(
-            subjectId,
+            { _id: subjectId, userId: req.user.id },
             { name, description, color },
             { new: true }
         )

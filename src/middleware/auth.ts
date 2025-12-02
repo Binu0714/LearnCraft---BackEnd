@@ -22,8 +22,14 @@ export const authenticate = (
     const token = authHeader.split(" ")[1] // ["Bearer", "fjhkuvjdjbknlmd"]
   
     try {
-        const payload = jwt.verify(token, JWT_SECRET)
-        req.user = payload
+        const payload: any = jwt.verify(token, JWT_SECRET)
+        // req.user = payload
+
+        req.user = {
+          _id: payload.sub,
+          ...payload
+        }
+
         next()
     } catch (err) {
         res.status(401).json({ message: "Invalid or expire token" })
