@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { createSubject, getSubjects, deleteSubject } from "../controllers/subject.controller"
+import { createSubject, getSubjects, deleteSubject, updateSubject } from "../controllers/subject.controller"
 import { authenticate } from "../middleware/auth"
 
 const router = Router()
@@ -20,6 +20,12 @@ router.delete(
     "/:id", 
     authenticate, 
     deleteSubject
+)
+
+router.put(
+    "/:id",
+    authenticate,
+    updateSubject
 )
 
 

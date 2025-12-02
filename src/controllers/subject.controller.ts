@@ -66,9 +66,39 @@ export const deleteSubject = async (req: AuthRequest, res: Response) => {
             message: "Subject deleted successfully",
             data: deletedSubject
         })
-        
+
     }catch (error) {
         console.error(error)
         res.status(500).json({ message: "Fail to Delete Subject" })
+    }
+}
+
+export const updateSubject = async (req: AuthRequest, res: Response) => {
+    try{
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" })
+        }
+
+        const subjectId = req.params.id
+        const { name, description, color } = req.body
+        
+        const updatedSubject = await Subject.findByIdAndUpdate(
+            subjectId,
+            { name, description, color },
+            { new: true }
+        )
+
+        if (!updatedSubject) {
+            return res.status(404).json({ message: "Subject not found" })
+        }
+
+        res.status(200).json({
+            message: "Subject updated successfully",
+            data: updatedSubject
+        })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Fail to Update Subject" })
     }
 }
