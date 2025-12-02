@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import authRouter from "./routes/auth.routes"
+import subjectRouter from "./routes/subject.routes"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 dotenv.config()
@@ -21,6 +22,7 @@ app.use(
 app.use(express.json())
 
 app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/subjects", subjectRouter)
 
 mongoose
   .connect(MONGO_URI)
