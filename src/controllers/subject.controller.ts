@@ -31,3 +31,19 @@ export const createSubject = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: "Fail to Save Post" })
     }
 }
+
+export const getSubjects = async (req: AuthRequest, res: Response) => {
+    try{
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" })
+        }
+        const subjects = await Subject.find()
+        res.status(200).json({
+            message: "Subjects retrieved successfully",
+            data: subjects
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Fail to Retrieve Subjects" })
+    }
+}
