@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { createSubject, getSubjects } from "../controllers/subject.controller"
+import { createSubject, getSubjects, deleteSubject } from "../controllers/subject.controller"
 import { authenticate } from "../middleware/auth"
 
 const router = Router()
@@ -15,5 +15,12 @@ router.get(
     authenticate,
     getSubjects
 )
+
+router.delete(
+    "/:id", 
+    authenticate, 
+    deleteSubject
+)
+
 
 export default router
