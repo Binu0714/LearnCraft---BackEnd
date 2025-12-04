@@ -4,6 +4,7 @@ import authRouter from "./routes/auth.routes"
 import subjectRouter from "./routes/subject.routes"
 import routineRouter from "./routes/routine.routes"
 import priorityRouter from "./routes/priority.routes"
+import scheduleRouter from "./routes/schedule.routes"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 dotenv.config()
@@ -27,6 +28,7 @@ app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/subjects", subjectRouter)
 app.use("/api/v1/routines", routineRouter)
 app.use("/api/v1/priorities", priorityRouter)
+app.use("/api/v1/schedules", scheduleRouter)
 
 mongoose
   .connect(MONGO_URI)
