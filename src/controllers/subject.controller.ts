@@ -86,8 +86,8 @@ export const updateSubject = async (req: AuthRequest, res: Response) => {
         const subjectId = req.params.id
         const { name, description, color } = req.body
         
-        const updatedSubject = await Subject.findByIdAndUpdate(
-            { _id: subjectId, userId: req.user.id },
+        const updatedSubject = await Subject.findOneAndUpdate(
+            { _id: subjectId, userId: req.user._id },
             { name, description, color },
             { new: true }
         )
