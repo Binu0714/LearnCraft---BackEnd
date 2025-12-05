@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express from "express"
 import cors from "cors"
 import authRouter from "./routes/auth.routes"
@@ -5,14 +7,17 @@ import subjectRouter from "./routes/subject.routes"
 import routineRouter from "./routes/routine.routes"
 import priorityRouter from "./routes/priority.routes"
 import scheduleRouter from "./routes/schedule.routes"
-import dotenv from "dotenv"
 import mongoose from "mongoose"
-dotenv.config()
+import passport from "passport";
+import "./config/passport";
+
 
 const SERVER_PORT = process.env.SERVER_PORT
 const MONGO_URI = process.env.MONGO_URI as string
 
 const app = express()
+
+app.use(passport.initialize());
 
 app.use(express.json())
 app.use(
