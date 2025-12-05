@@ -40,34 +40,34 @@ passport.use(
 );
 
 // --- FACEBOOK STRATEGY ---
-// passport.use(
-//   new FacebookStrategy(
-//     {
-//       clientID: process.env.FACEBOOK_APP_ID!,
-//       clientSecret: process.env.FACEBOOK_APP_SECRET!,
-//       callbackURL: "/api/auth/facebook/callback",
-//       profileFields: ["id", "displayName", "emails"], // Request specific fields
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       try {
-//         let user = await User.findOne({ email: profile.emails?.[0].value });
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_APP_ID!,
+      clientSecret: process.env.FACEBOOK_APP_SECRET!,
+      callbackURL: "http://localhost:5000/api/v1/auth/facebook/callback",
+      profileFields: ["id", "displayName", "emails"], // Request specific fields
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ email: profile.emails?.[0].value });
 
-//         if (user) return done(null, user);
+        if (user) return done(null, user);
 
-//         user = new User({
-//           username: profile.displayName,
-//           email: profile.emails?.[0].value,
-//           password: "", 
-//           roles: ["USER"],
-//         });
+        user = new User({
+          username: profile.displayName,
+          email: profile.emails?.[0].value,
+          password: "", 
+          roles: ["USER"],
+        });
 
-//         await user.save();
-//         done(null, user);
-//       } catch (err) {
-//         done(err, undefined);
-//       }
-//     }
-//   )
-// );
+        await user.save();
+        done(null, user);
+      } catch (err) {
+        done(err, undefined);
+      }
+    }
+  )
+);
 
 export default passport;
