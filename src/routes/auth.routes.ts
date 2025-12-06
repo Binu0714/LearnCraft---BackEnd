@@ -4,7 +4,8 @@ import {
     handleRefreshToken,
     login,
     register,
-    socialLoginSuccess
+    socialLoginSuccess,
+    updateUser
 } from "../controllers/auth.controller"
 import { authenticate } from "../middleware/auth"
 import passport from "passport";
@@ -57,5 +58,11 @@ router.get(
   passport.authenticate("facebook", { session: false, failureRedirect: "/login" }),
   socialLoginSuccess
 );
+
+router.put(
+    "/:id",
+    authenticate,
+    updateUser
+)
 
 export default router

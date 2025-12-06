@@ -150,3 +150,31 @@ export const socialLoginSuccess = async (req: Request, res: Response) => {
     res.redirect(`${process.env.CLIENT_URL}/login`);
   }
 };
+
+export const updateUser = async (req: AuthRequest, res: Response) => {
+    try{
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" })
+        }
+
+        const userId = req.params.id
+        const { username, email } = req.body
+
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: userId },
+            { username, email },
+            { new: true }
+        ).select("-password")
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        res.status(200).json({
+            message: "User updated successfully",
+            data: updatedUser
+        })
+    } catch (err: any) {
+        res.status(500).json({ message: "Internal server error" })
+    }
+}
