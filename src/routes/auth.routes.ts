@@ -7,6 +7,7 @@ import {
     socialLoginSuccess,
     updateUser
 } from "../controllers/auth.controller"
+import { PasswordController } from "../controllers/password.controller"
 import { authenticate } from "../middleware/auth"
 import passport from "passport";
 
@@ -64,5 +65,15 @@ router.put(
     authenticate,
     updateUser
 )
+
+router.post(
+  "/request-password-reset", 
+  PasswordController.requestPasswordReset
+);
+
+router.post(
+  "/reset-password/:token", 
+  PasswordController.resetPassword
+);
 
 export default router
