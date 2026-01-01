@@ -3,58 +3,83 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { User } from "../models/User";
 import nodemailer from "nodemailer";
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
-// Create Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
+export const transporter = nodemailer.createTransport({
+  host: process.env.MAILTRAP_HOST,
+  port: Number(process.env.MAILTRAP_PORT),
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    user: process.env.MAILTRAP_USER,
+    pass: process.env.MAILTRAP_PASS,
+  },
 });
 
 export class PasswordController {
-
-  // --- Request Password Reset ---
+ 
   static async requestPasswordReset(req: Request, res: Response) {
     try {
       const { email } = req.body;
 
       const user = await User.findOne({ email });
-      if (!user) return res.json({ message: "If the account exists, reset email sent." });
+      if (!user) {
+        return res.json({ message: "If the account exists, reset email sent." });
+      }
 
-      // Generate token
       const resetToken = crypto.randomBytes(32).toString("hex");
+
       user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 min expiry
       await user.save();
 
-      // Reset link
-      const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+      const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-      // Send email
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: '"Study App" <no-reply@studyapp.com>',
         to: user.email,
-        subject: "Password Reset Request",
+        subject: "Password Reset Instructions",
         html: `
           <p>Hello ${user.username},</p>
-          <p>You requested a password reset. Click the link below to reset your password:</p>
-          <a href="${resetLink}">${resetLink}</a>
+          <p>We received a request to reset your password for your Study App account.</p>
+          <p>Click the button below to reset your password:</p>
+          <p style="text-align:center;">
+            <a href="${resetLink}" style="
+              display:inline-block;
+              padding:10px 20px;
+              font-size:16px;
+              color:white;
+              background-color:#4CAF50;
+              text-decoration:none;
+              border-radius:5px;
+            ">Reset Password</a>
+          </p>
+          <p>If you did not request a password reset, please ignore this email.</p>
           <p>This link will expire in 15 minutes.</p>
-        `
+          <p>Thank you,<br/>Study App Team</p>
+        `,
+        text: `Hello ${user.username},
+
+        We received a request to reset your password for your Study App account.
+
+        Copy and paste this link in your browser to reset your password:
+        ${resetLink}
+
+        If you did not request a password reset, please ignore this message.
+
+        This link will expire in 15 minutes.
+
+        Thank you,
+        Study App Team
+        `,
       });
 
-      res.json({ message: "Reset email sent successfully" });
-    } catch (err: any) {
-      console.error(err);
-      res.status(500).json({ message: "Server error" });
+      return res.json({ message: "Reset email sent successfully" });
+    } catch (err) {
+      console.error("Password reset error:", err);
+      return res.status(500).json({ message: "Server error" });
     }
   }
 
-  // --- Reset Password ---
   static async resetPassword(req: Request, res: Response) {
     try {
       const { token } = req.params;
@@ -62,21 +87,22 @@ export class PasswordController {
 
       const user = await User.findOne({
         resetPasswordToken: token,
-        resetPasswordExpires: { $gt: new Date() }
+        resetPasswordExpires: { $gt: new Date() },
       });
 
-      if (!user) return res.status(400).json({ message: "Invalid or expired token" });
+      if (!user)
+        return res.status(400).json({ message: "Invalid or expired token" });
 
-      // Hash new password
       user.password = await bcrypt.hash(password, 10);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
+
       await user.save();
 
-      res.json({ message: "Password reset successfully" });
-    } catch (err: any) {
-      console.error(err);
-      res.status(500).json({ message: "Server error" });
+      return res.json({ message: "Password reset successfully" });
+    } catch (err) {
+      console.error("Reset password error:", err);
+      return res.status(500).json({ message: "Server error" });
     }
   }
 }
