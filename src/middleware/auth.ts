@@ -19,12 +19,11 @@ export const authenticate = (
         return res.status(401).json({ message: "No token provided" })
     }
 
-    const token = authHeader.split(" ")[1] // ["Bearer", "fjhkuvjdjbknlmd"]
+    const token = authHeader.split(" ")[1] 
   
     try {
         const payload: any = jwt.verify(token, JWT_SECRET)
-        // req.user = payload
-
+       
         req.user = {
           _id: payload.sub,
           ...payload

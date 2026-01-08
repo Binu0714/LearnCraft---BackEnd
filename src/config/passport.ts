@@ -4,7 +4,6 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import { User } from "../models/User"; // Import your User model
 import crypto from "crypto";
 
-// --- GOOGLE STRATEGY ---
 passport.use(
   new GoogleStrategy(
     {
@@ -14,21 +13,18 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // 1. Check if user already exists by email
         let user = await User.findOne({ email: profile.emails?.[0].value });
 
         if (user) {
           return done(null, user);
         }
 
-        // 2. If not, create a new user
-        // Note: Password is empty or generated random string because they login via Google
         user = new User({
           username: profile.displayName,
           email: profile.emails?.[0].value,
-          password: "", // Ensure your User model allows empty password or handle this
+          password: "", 
           roles: ["USER"],
-          // Optional: avatar: profile.photos?.[0].value
+          
         });
 
         await user.save();
@@ -40,14 +36,14 @@ passport.use(
   )
 );
 
-// --- FACEBOOK STRATEGY ---
+// FACEBOOK STRATEGY
 passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_APP_ID!,
       clientSecret: process.env.FACEBOOK_APP_SECRET!,
       callbackURL: "http://localhost:5000/api/v1/auth/facebook/callback",
-      profileFields: ["id", "displayName", "emails", "photos"], // Request emails & photos
+      profileFields: ["id", "displayName", "emails", "photos"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -59,7 +55,6 @@ passport.use(
         let user = await User.findOne({ email });
         if (user) return done(null, user);
 
-        // Create new user with random password
         user = new User({
           username: profile.displayName || "FacebookUser",
           email,

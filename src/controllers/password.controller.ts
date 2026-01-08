@@ -29,7 +29,7 @@ export class PasswordController {
       const resetToken = crypto.randomBytes(32).toString("hex");
 
       user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 min expiry
+      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
 
       const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;

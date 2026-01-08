@@ -131,17 +131,15 @@ export const getMyDetails = async (req: AuthRequest, res: Response) => {
 
 export const socialLoginSuccess = async (req: Request, res: Response) => {
   try {
-    const user = req.user as any; // Passport attaches the user to req
+    const user = req.user as any; 
 
     if (!user) {
       return res.redirect(`${process.env.CLIENT_URL}/login`);
     }
 
-    // Generate tokens using your existing utility
     const accessToken = signAccessToken(user);
     const refreshToken = signRefreshToken(user);
 
-    // Redirect to Frontend with tokens in URL
     res.redirect(
       `${process.env.CLIENT_URL}/auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}`
     );
